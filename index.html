@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irregular Verbs Master - Impara i Verbi Irregolari Inglesi</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🎯 Irregular Verbs Master</h1>
+            <p class="subtitle">Diventa un esperto dei verbi irregolari inglesi!</p>
+        </header>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-icon">🔥</span>
+                <span class="stat-label">Streak</span>
+                <span class="stat-value" id="streak">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-icon">⭐</span>
+                <span class="stat-label">Punteggio</span>
+                <span class="stat-value" id="score">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-icon">📊</span>
+                <span class="stat-label">Livello</span>
+                <span class="stat-value" id="level">1</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-icon">✅</span>
+                <span class="stat-label">Corrette</span>
+                <span class="stat-value"><span id="correct">0</span>/<span id="total">0</span></span>
+            </div>
+        </div>
+
+        <!-- Mode Selection -->
+        <div class="mode-selection" id="modeSelection">
+            <h2>Scegli la modalità di esercizio</h2>
+            <div class="mode-grid">
+                <div class="mode-card" onclick="startExercise('fill')">
+                    <div class="mode-icon">✍️</div>
+                    <h3>Completa il Verbo</h3>
+                    <p>Scrivi la forma corretta del verbo</p>
+                    <div class="difficulty">Difficoltà: ⭐⭐⭐</div>
+                </div>
+                <div class="mode-card" onclick="startExercise('multiple')">
+                    <div class="mode-icon">🎲</div>
+                    <h3>Quiz a Scelta Multipla</h3>
+                    <p>Scegli la risposta corretta</p>
+                    <div class="difficulty">Difficoltà: ⭐⭐</div>
+                </div>
+                <div class="mode-card" onclick="startExercise('match')">
+                    <div class="mode-icon">🎯</div>
+                    <h3>Associa le Forme</h3>
+                    <p>Abbina base, past e past participle</p>
+                    <div class="difficulty">Difficoltà: ⭐</div>
+                </div>
+                <div class="mode-card" onclick="startExercise('practice')">
+                    <div class="mode-icon">📚</div>
+                    <h3>Modalità Pratica</h3>
+                    <p>Esplora tutti i 100 verbi</p>
+                    <div class="difficulty">Senza punteggio</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exercise Area -->
+        <div class="exercise-area" id="exerciseArea" style="display: none;">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="exercise-card">
+                <button class="back-button" onclick="backToMenu()">← Menu</button>
+
+                <div class="question-number">
+                    Domanda <span id="currentQuestion">1</span> di <span id="totalQuestions">10</span>
+                </div>
+
+                <div class="exercise-content" id="exerciseContent">
+                    <!-- Content will be dynamically inserted -->
+                </div>
+
+                <div class="feedback" id="feedback"></div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" id="submitBtn" onclick="checkAnswer()">Verifica</button>
+                    <button class="btn btn-secondary" id="nextBtn" onclick="nextQuestion()" style="display: none;">Prossima →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="results-screen" id="resultsScreen" style="display: none;">
+            <div class="results-card">
+                <h2>🎉 Esercizio Completato!</h2>
+                <div class="results-stats">
+                    <div class="result-item">
+                        <div class="result-label">Risposte Corrette</div>
+                        <div class="result-value" id="finalCorrect">0/10</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Precisione</div>
+                        <div class="result-value" id="finalAccuracy">0%</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Punti Guadagnati</div>
+                        <div class="result-value" id="pointsEarned">+0</div>
+                    </div>
+                </div>
+                <div class="results-message" id="resultsMessage"></div>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="backToMenu()">Nuovo Esercizio</button>
+                    <button class="btn btn-secondary" onclick="reviewMistakes()">Rivedi Errori</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Practice Mode -->
+        <div class="practice-mode" id="practiceMode" style="display: none;">
+            <button class="back-button" onclick="backToMenu()">← Menu</button>
+            <h2>📚 Studia i 100 Verbi Irregolari</h2>
+
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Cerca un verbo..." onkeyup="filterVerbs()">
+            </div>
+
+            <div class="verbs-grid" id="verbsGrid">
+                <!-- Verbs will be dynamically inserted -->
+            </div>
+        </div>
+    </div>
+
+    <script src="verbs-data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
