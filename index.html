@@ -4,6 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Irregular Verbs Master - Impara i Verbi Irregolari Inglesi</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Impara i 200 verbi irregolari inglesi più comuni con quiz interattivi. App educativa gratuita!">
+    <meta name="theme-color" content="#667eea">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Verbs Master">
+
+    <!-- PWA Icons -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="icon-192.svg">
+    <link rel="apple-touch-icon" href="icon-192.svg">
+
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -138,5 +152,38 @@
 
     <script src="verbs-data.js"></script>
     <script src="app.js"></script>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        // Registra il Service Worker per funzionalità offline
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => {
+                        console.log('✅ Service Worker registrato con successo:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('❌ Registrazione Service Worker fallita:', error);
+                    });
+            });
+        }
+
+        // Prompt installazione PWA
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Previene il prompt automatico
+            e.preventDefault();
+            deferredPrompt = e;
+
+            // Mostra un messaggio personalizzato (opzionale)
+            console.log('💡 App installabile! L\'utente può aggiungerla alla home screen.');
+        });
+
+        // Gestione post-installazione
+        window.addEventListener('appinstalled', () => {
+            console.log('🎉 App installata con successo!');
+            deferredPrompt = null;
+        });
+    </script>
 </body>
 </html>
