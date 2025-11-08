@@ -108,6 +108,7 @@ const irregularVerbs = [
     { base: "breed", past: "bred", participle: "bred", italian: "allevare" },
     { base: "broadcast", past: "broadcast", participle: "broadcast", italian: "trasmettere" },
     { base: "burst", past: "burst", participle: "burst", italian: "scoppiare" },
+    { base: "burn", past: "burnt/burned", participle: "burnt/burned", italian: "bruciare" },
     { base: "cast", past: "cast", participle: "cast", italian: "lanciare" },
     { base: "cling", past: "clung", participle: "clung", italian: "aggrapparsi" },
     { base: "cost", past: "cost", participle: "cost", italian: "costare" },
