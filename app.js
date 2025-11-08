@@ -10,7 +10,8 @@ let gameState = {
     totalQuestions: 10,
     questions: [],
     mistakes: [],
-    selectedAnswer: null
+    selectedAnswer: null,
+    selectedMatchLabel: null // For match mode: stores the currently selected label
 };
 
 // Load saved progress from localStorage
@@ -136,10 +137,20 @@ function generateMultipleChoiceQuestion(verb) {
 
 // Generate match question
 function generateMatchQuestion(verb) {
+    // Create shuffled forms array
+    const forms = [
+        { value: verb.base, type: 'base' },
+        { value: verb.past, type: 'past' },
+        { value: verb.participle, type: 'participle' }
+    ];
+    shuffleArray(forms);
+
     return {
         type: 'match',
         verb: verb,
-        correctAnswer: { base: verb.base, past: verb.past, participle: verb.participle }
+        shuffledForms: forms,
+        correctAnswer: { base: verb.base, past: verb.past, participle: verb.participle },
+        userMatches: {} // Will store user's matches: { 'base': 'went', 'past': 'gone', etc. }
     };
 }
 
@@ -156,6 +167,7 @@ function showQuestion() {
     const question = gameState.questions[gameState.currentQuestion];
     const content = document.getElementById('exerciseContent');
     gameState.selectedAnswer = null;
+    gameState.selectedMatchLabel = null;
 
     // Update progress
     document.getElementById('currentQuestion').textContent = gameState.currentQuestion + 1;
@@ -210,22 +222,22 @@ function showQuestion() {
         content.innerHTML = `
             <div class="question-text">Associa le forme del verbo:</div>
             <div class="verb-prompt">${question.verb.italian}</div>
+            <div class="match-instructions">Clicca prima su un'etichetta, poi sulla forma corrispondente</div>
             <div class="match-grid">
                 <div class="match-column">
-                    <h4>Base Form</h4>
-                    <div class="match-item" onclick="selectMatch(this, '${question.verb.base}')">${question.verb.base}</div>
+                    <h4>Etichette</h4>
+                    <div class="match-item match-label" data-type="base" onclick="selectMatchLabel(this, 'base')">Base Form</div>
+                    <div class="match-item match-label" data-type="past" onclick="selectMatchLabel(this, 'past')">Past Simple</div>
+                    <div class="match-item match-label" data-type="participle" onclick="selectMatchLabel(this, 'participle')">Past Participle</div>
                 </div>
                 <div class="match-column">
-                    <h4>Past Simple</h4>
-                    <div class="match-item" onclick="selectMatch(this, '${question.verb.past}')">${question.verb.past}</div>
+                    <h4>Forme</h4>
+                    ${question.shuffledForms.map((form, index) => `
+                        <div class="match-item match-value" data-value="${form.value}" data-type="${form.type}" onclick="selectMatchValue(this, '${form.value}', '${form.type}')">${form.value}</div>
+                    `).join('')}
                 </div>
             </div>
-            <div class="match-grid" style="margin-top: 20px;">
-                <div class="match-column">
-                    <h4>Past Participle</h4>
-                    <div class="match-item" onclick="selectMatch(this, '${question.verb.participle}')">${question.verb.participle}</div>
-                </div>
-            </div>
+            <div id="matchStatus" class="match-status"></div>
         `;
     }
 }
@@ -242,10 +254,71 @@ function selectOption(option) {
     gameState.selectedAnswer = option;
 }
 
-// Select match item
-function selectMatch(element, value) {
-    element.classList.add('correct');
+// Select match label (left column)
+function selectMatchLabel(element, type) {
+    // Remove previous selection
+    document.querySelectorAll('.match-label').forEach(label => {
+        label.classList.remove('selected');
+    });
+
+    // Select this label
+    element.classList.add('selected');
+    gameState.selectedMatchLabel = type;
+
+    // Update status message
+    const statusDiv = document.getElementById('matchStatus');
+    const labelNames = {
+        'base': 'Base Form',
+        'past': 'Past Simple',
+        'participle': 'Past Participle'
+    };
+    statusDiv.textContent = `Hai selezionato: ${labelNames[type]}. Ora clicca sulla forma corrispondente.`;
+    statusDiv.style.color = '#667eea';
+}
+
+// Select match value (right column)
+function selectMatchValue(element, value, correctType) {
+    const question = gameState.questions[gameState.currentQuestion];
+    const statusDiv = document.getElementById('matchStatus');
+
+    // Check if a label is selected
+    if (!gameState.selectedMatchLabel) {
+        statusDiv.textContent = 'Seleziona prima un\'etichetta dalla colonna sinistra!';
+        statusDiv.style.color = '#991b1b';
+        return;
+    }
+
+    // Check if this value is already matched
+    if (element.classList.contains('matched')) {
+        statusDiv.textContent = 'Questa forma è già stata abbinata!';
+        statusDiv.style.color = '#991b1b';
+        return;
+    }
+
+    // Store the user's match
+    question.userMatches[gameState.selectedMatchLabel] = value;
+
+    // Mark both items as matched
+    element.classList.add('matched');
     element.style.pointerEvents = 'none';
+
+    const selectedLabel = document.querySelector(`.match-label[data-type="${gameState.selectedMatchLabel}"]`);
+    selectedLabel.classList.remove('selected');
+    selectedLabel.classList.add('matched');
+    selectedLabel.style.pointerEvents = 'none';
+
+    // Show connection
+    statusDiv.textContent = `Abbinamento registrato! (${Object.keys(question.userMatches).length}/3)`;
+    statusDiv.style.color = '#10b981';
+
+    // Reset selection
+    gameState.selectedMatchLabel = null;
+
+    // Check if all matches are done
+    if (Object.keys(question.userMatches).length === 3) {
+        statusDiv.textContent = 'Tutti gli abbinamenti completati! Clicca su Verifica per controllare.';
+        statusDiv.style.color = '#667eea';
+    }
 }
 
 // Check answer
@@ -270,9 +343,45 @@ function checkAnswer() {
         isCorrect = userAnswer === question.correctAnswer;
 
     } else if (question.type === 'match') {
-        // For match, if all items are selected, it's correct
-        const selectedItems = document.querySelectorAll('.match-item.correct');
-        isCorrect = selectedItems.length === 3;
+        // Check if all matches are made
+        if (Object.keys(question.userMatches).length < 3) {
+            feedback.textContent = 'Completa tutti e 3 gli abbinamenti prima di verificare!';
+            feedback.className = 'feedback incorrect';
+            feedback.style.display = 'block';
+            return;
+        }
+
+        // Verify all matches are correct
+        isCorrect =
+            question.userMatches.base === question.correctAnswer.base &&
+            question.userMatches.past === question.correctAnswer.past &&
+            question.userMatches.participle === question.correctAnswer.participle;
+
+        // Visual feedback for each match
+        if (!isCorrect) {
+            // Highlight incorrect matches
+            Object.keys(question.userMatches).forEach(type => {
+                const userValue = question.userMatches[type];
+                const correctValue = question.correctAnswer[type];
+                const valueElement = document.querySelector(`.match-value[data-value="${userValue}"]`);
+
+                if (userValue !== correctValue) {
+                    valueElement.classList.remove('matched');
+                    valueElement.classList.add('incorrect');
+                } else {
+                    valueElement.classList.add('correct');
+                }
+            });
+        } else {
+            // All correct - mark everything as correct
+            document.querySelectorAll('.match-item.matched').forEach(item => {
+                item.classList.add('correct');
+            });
+        }
+
+        userAnswer = Object.entries(question.userMatches)
+            .map(([type, value]) => `${type}: ${value}`)
+            .join(', ');
     }
 
     // Update stats
@@ -295,7 +404,16 @@ function checkAnswer() {
 
     } else {
         gameState.streak = 0;
-        feedback.innerHTML = `❌ Sbagliato! La risposta corretta è: <strong>${question.correctAnswer}</strong>`;
+
+        // Format correct answer based on question type
+        let correctAnswerText = '';
+        if (question.type === 'match') {
+            correctAnswerText = `Base: ${question.correctAnswer.base}, Past: ${question.correctAnswer.past}, Participle: ${question.correctAnswer.participle}`;
+        } else {
+            correctAnswerText = question.correctAnswer;
+        }
+
+        feedback.innerHTML = `❌ Sbagliato! La risposta corretta è: <strong>${correctAnswerText}</strong>`;
         feedback.className = 'feedback incorrect';
 
         // Save mistake
