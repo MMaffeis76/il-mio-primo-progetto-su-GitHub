@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generatore Icone PWA - Irregular Verbs Master</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: white;
+            color: #333;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        h1 { color: #667eea; text-align: center; }
+        canvas { border: 2px solid #667eea; margin: 10px; display: inline-block; }
+        .preview { text-align: center; margin: 20px 0; }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: bold;
+        }
+        button:hover { background: #5568d3; }
+        .success {
+            background: #10b981;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        .instructions {
+            background: #f3f4f6;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .instructions h3 { color: #667eea; margin-top: 0; }
+        .instructions ol { padding-left: 20px; }
+        .instructions li { margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Generatore Icone PWA</h1>
+        <p style="text-align: center; color: #666;">
+            Genera le icone per la tua Progressive Web App in 1 click!
+        </p>
+
+        <div class="preview">
+            <h3>Anteprima Icone:</h3>
+            <canvas id="canvas192" width="192" height="192"></canvas>
+            <canvas id="canvas512" width="512" height="512"></canvas>
+        </div>
+
+        <div style="text-align: center;">
+            <button onclick="generateIcons()">🎨 Genera Icone</button>
+            <button onclick="downloadIcon('icon-192.png', 192)">⬇️ Scarica 192x192</button>
+            <button onclick="downloadIcon('icon-512.png', 512)">⬇️ Scarica 512x512</button>
+        </div>
+
+        <div class="success" id="success">
+            ✅ Icone generate con successo! Clicca sui pulsanti per scaricarle.
+        </div>
+
+        <div class="instructions">
+            <h3>📋 Istruzioni:</h3>
+            <ol>
+                <li><strong>Clicca "Genera Icone"</strong> - vedrai l'anteprima sopra</li>
+                <li><strong>Scarica entrambe le icone</strong> usando i pulsanti</li>
+                <li><strong>Salva i file</strong> nella cartella del progetto come:
+                    <ul>
+                        <li><code>icon-192.png</code></li>
+                        <li><code>icon-512.png</code></li>
+                    </ul>
+                </li>
+                <li><strong>Fai commit e push</strong> insieme agli altri file</li>
+            </ol>
+            <p><strong>💡 Suggerimento:</strong> Puoi personalizzare le icone modificando il codice JavaScript qui sotto!</p>
+        </div>
+    </div>
+
+    <script>
+        function drawIcon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+
+            // Draw target emoji/icon
+            const emojiSize = size * 0.6;
+            ctx.font = `${emojiSize}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🎯', size / 2, size / 2);
+
+            // Add text at bottom
+            const textSize = size * 0.12;
+            ctx.font = `bold ${textSize}px Arial`;
+            ctx.fillStyle = 'white';
+            ctx.shadowColor = 'rgba(0,0,0,0.5)';
+            ctx.shadowBlur = 10;
+            ctx.fillText('VERBS', size / 2, size * 0.85);
+            ctx.shadowBlur = 0;
+        }
+
+        function generateIcons() {
+            const canvas192 = document.getElementById('canvas192');
+            const canvas512 = document.getElementById('canvas512');
+
+            drawIcon(canvas192, 192);
+            drawIcon(canvas512, 512);
+
+            document.getElementById('success').style.display = 'block';
+        }
+
+        function downloadIcon(filename, size) {
+            const canvas = size === 192 ?
+                document.getElementById('canvas192') :
+                document.getElementById('canvas512');
+
+            // Create download link
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // Generate on load
+        window.addEventListener('load', generateIcons);
+    </script>
+</body>
+</html>
