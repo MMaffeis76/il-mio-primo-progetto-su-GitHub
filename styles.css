@@ -297,6 +297,37 @@ body {
     border-color: #10b981;
 }
 
+.match-item.matched {
+    background: #dbeafe;
+    border-color: #3b82f6;
+    color: #1e40af;
+}
+
+.match-item.incorrect {
+    background: #fee2e2;
+    border-color: #ef4444;
+    color: #991b1b;
+}
+
+.match-instructions {
+    text-align: center;
+    color: #666;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    font-style: italic;
+}
+
+.match-status {
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    background: #f3f4f6;
+    min-height: 50px;
+}
+
 .feedback {
     text-align: center;
     padding: 20px;
