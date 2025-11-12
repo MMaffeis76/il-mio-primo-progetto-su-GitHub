@@ -1,7 +1,7 @@
 // Service Worker per Irregular Verbs Master PWA
 // Versione: 1.0.0
 
-const CACHE_NAME = 'irregular-verbs-master-v1';
+const CACHE_NAME = 'irregular-verbs-master-v2';
 const urlsToCache = [
   '/il-mio-primo-progetto-su-GitHub/',
   '/il-mio-primo-progetto-su-GitHub/index.html',
